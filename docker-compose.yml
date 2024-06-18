@@ -1,0 +1,41 @@
+version: '3.9'
+services:
+  database:
+    image: 'postgres:16.2-alpine3.19'
+    environment:
+      - POSTGRES_NAME=postgres
+      - POSTGRES_HOST=localhost
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=ZoRex
+      - POSTGRES_PASSWORD=12345
+    restart: 'on-failure'
+    ports:
+      - '5432:5432'
+    volumes:
+      - db_data:/var/lib/postgresql/data/
+
+  pg_admin:
+    image: dpage/pgadmin4:latest
+    restart: on-failure
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=email
+      - PGADMIN_DEFAULT_PASSWORD=12345
+    ports:
+      - '5050:80'
+
+  rabbitmq:
+    image: 'heidiks/rabbitmq-delayed-message-exchange:latest'
+    restart: 'on-failure'
+    ports:
+      - "5672:5672"  # порт для AMQP
+      - "15672:15672"  # порт для управляющего интерфейс
+    environment:
+      - RABBITMQ_DEFAULT_USER=ZoRex
+      - RABBITMQ_DEFAULT_PASS=12345
+      - RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS=-rabbit disk_free_limit 1431655766
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    
+volumes:
+  db_data:
+  rabbitmq_data: 
